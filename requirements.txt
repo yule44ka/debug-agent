@@ -10,6 +10,7 @@ accelerate>=0.24.0
 
 # Dataset and evaluation
 datasets>=2.14.0
+pandas>=2.0.0
 
 # Code execution and testing
 pytest>=7.4.0

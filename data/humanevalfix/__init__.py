@@ -1,2 +1,0 @@
-"""HumanEvalFix dataset loader."""
-
