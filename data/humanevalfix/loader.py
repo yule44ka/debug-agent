@@ -3,6 +3,7 @@
 from datasets import load_dataset
 from typing import List, Dict, Any
 import os
+import csv
 
 
 class HumanEvalFixLoader:
@@ -141,6 +142,43 @@ class HumanEvalFixLoader:
             if task["task_id"] == task_id:
                 return task
         return None
+    
+    def save_to_csv(self, tasks: List[Dict[str, Any]], output_path: str = "humanevalfix_dataset.csv") -> None:
+        """
+        Save the dataset to a CSV file.
+        
+        Args:
+            tasks: List of task dictionaries to save
+            output_path: Path to output CSV file
+        """
+        if not tasks:
+            print("No tasks to save.")
+            return
+        
+        # Define CSV columns
+        fieldnames = ["task_id", "docstring", "buggy_code", "fixed_code", "tests"]
+        
+        try:
+            with open(output_path, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                
+                # Write header
+                writer.writeheader()
+                
+                # Write rows
+                for task in tasks:
+                    writer.writerow({
+                        "task_id": task.get("task_id", "").strip(),
+                        "docstring": task.get("docstring", "").strip(),
+                        "buggy_code": task.get("buggy_code", "").strip(),
+                        "fixed_code": task.get("fixed_code", "").strip(),
+                        "tests": task.get("tests", "").strip()
+                    })
+            
+            print(f"Successfully saved {len(tasks)} tasks to {output_path}")
+            
+        except Exception as e:
+            print(f"Error saving to CSV: {e}")
 
 
 if __name__ == "__main__":
@@ -154,4 +192,8 @@ if __name__ == "__main__":
         print(f"Task ID: {tasks[0]['task_id']}")
         print(f"Buggy code:\n{tasks[0]['buggy_code']}")
         print(f"Tests:\n{tasks[0]['tests']}")
+        
+        # Save to CSV
+        print("\nSaving dataset to CSV...")
+        loader.save_to_csv(tasks, "humanevalfix_dataset.csv")
 
