@@ -66,11 +66,11 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
     # Iterate through each row in the dataset
     for idx, row in df.iterrows():
         task_id = row['task_id']
-        canonical_code = row[version]
-        test_code = row['test']
-        
-        # Combine canonical_code and test
-        full_code = canonical_code + "\n\n" + test_code
+        column = version + '_function'
+        code = row[column]
+
+        # Combine code and test
+        full_code = code + row['test']
         
         print(f"[{idx + 1}/{len(df)}] Running tests for task {task_id}...", end=" ")
         
@@ -159,7 +159,7 @@ def main():
         sys.exit(1)
     
     # Run tests
-    version = "buggy_code"
+    version = "canonical"
     timeout = 5  # seconds
     results = run_tests(str(csv_path), version, timeout)
     

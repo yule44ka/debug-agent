@@ -1,3 +1,5 @@
+import json
+
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ToolStrategy
 
@@ -22,4 +24,14 @@ agent = create_agent(
 result = agent.invoke(
     {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
 )
-print(result)
+
+try:
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+except (TypeError, ValueError):
+    if hasattr(result, 'dict'):
+        print(json.dumps(result.dict(), indent=2, ensure_ascii=False))
+    elif hasattr(result, '__dict__'):
+        print(json.dumps(result.__dict__, indent=2, ensure_ascii=False, default=str))
+    else:
+        from pprint import pprint
+        pprint(result, indent=2, width=100)
