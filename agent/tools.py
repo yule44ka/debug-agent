@@ -121,14 +121,18 @@ def run_tests(code_path: str) -> Dict[str, Any]:
         - success: boolean indicating if test passed
         - message: description of the result
         - traceback: detailed error information if applicable
+        - error_line: the line number where error occurred
+        - error_code: the actual line of code where error occurred
     """
     timeout_seconds = 5
 
     function_code = readfile(code_path)
-    test_code = readfile("test.py")
+    task_id = code_path.split("_")[-1].split(".")[0]
+    test_code = readfile(f"tmp/test/test_{task_id}.py")
     
     # Combine code and test exactly like evaluation.py does
     full_code = function_code + "\n\n" + test_code
+    full_code_lines = full_code.split('\n')
     
     # Set up the timeout handler
     signal.signal(signal.SIGALRM, timeout_handler)
@@ -154,7 +158,7 @@ def run_tests(code_path: str) -> Dict[str, Any]:
             result = {
                 "status": "passed",
                 "success": True,
-                "message": "✓ All tests executed successfully"
+                "message": "All tests executed successfully"
             }
             
             if stdout_output:
@@ -176,7 +180,7 @@ def run_tests(code_path: str) -> Dict[str, Any]:
         return {
             "status": "timeout",
             "success": False,
-            "message": f"⏱ Test execution timed out (exceeded {timeout_seconds} seconds)",
+            "message": f"Test execution timed out (exceeded {timeout_seconds} seconds)",
             "error": "TimeoutError",
             "traceback": traceback.format_exc()
         }
@@ -184,24 +188,70 @@ def run_tests(code_path: str) -> Dict[str, Any]:
     except AssertionError as e:
         # Test failed (assertion error)
         signal.alarm(0)  # Disable the alarm
-        return {
+        
+        # Extract line number and code from traceback
+        tb = traceback.extract_tb(sys.exc_info()[2])
+        error_line_num = None
+        error_code = None
+        
+        # Find the last frame that's in our executed code (not in <string>)
+        for frame in reversed(tb):
+            if frame.filename == '<string>':
+                error_line_num = frame.lineno
+                # Get the actual line of code (1-indexed to 0-indexed)
+                if 0 < error_line_num <= len(full_code_lines):
+                    error_code = full_code_lines[error_line_num - 1].strip()
+                break
+        
+        result = {
             "status": "failed",
             "success": False,
-            "message": f"✗ Test failed: {str(e) if str(e) else 'Assertion failed'}",
+            "message": f"✗Test failed: {str(e) if str(e) else 'Assertion failed'}",
             "error": "AssertionError",
             "traceback": traceback.format_exc()
         }
+        
+        if error_line_num:
+            result["error_line"] = error_line_num
+        if error_code:
+            result["error_code"] = error_code
+            result["message"] += f"\n  Line {error_line_num}: {error_code}"
+        
+        return result
     
     except Exception as e:
         # Execution error (other exceptions)
         signal.alarm(0)  # Disable the alarm
-        return {
+        
+        # Extract line number and code from traceback
+        tb = traceback.extract_tb(sys.exc_info()[2])
+        error_line_num = None
+        error_code = None
+        
+        # Find the last frame that's in our executed code
+        for frame in reversed(tb):
+            if frame.filename == '<string>':
+                error_line_num = frame.lineno
+                # Get the actual line of code (1-indexed to 0-indexed)
+                if 0 < error_line_num <= len(full_code_lines):
+                    error_code = full_code_lines[error_line_num - 1].strip()
+                break
+        
+        result = {
             "status": "error",
             "success": False,
             "message": f"✗ Execution error: {type(e).__name__}: {str(e)}",
             "error": type(e).__name__,
             "traceback": traceback.format_exc()
         }
+        
+        if error_line_num:
+            result["error_line"] = error_line_num
+        if error_code:
+            result["error_code"] = error_code
+            result["message"] += f"\n  Line {error_line_num}: {error_code}"
+        
+        return result
     
     finally:
         # Ensure alarm is always disabled

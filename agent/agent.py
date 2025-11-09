@@ -16,27 +16,30 @@ prompt = """You are an autonomous Python debugging agent. Your task is to fix fa
 - `read_file`: Read the contents of code files to understand the current implementation
 - `write_file`: Write updated code to files (always overwrites the entire file)
 
-**Your Workflow:**
-You must follow this exact sequence:
+**Context:**
+- Code file path: `code_1.py`
+- Code: Code of the current buggy implementation
+- Tests: Code of test
+- Test run results: Result of first run of the tests
 
-1. **Run Tests**: Call `run_tests` to see current test status
-2. **Check Results**: 
+**Your Workflow:**
+1. **Find bugs** Analyze code and find potential problems in the code
+2. **Fix Code**: Make targeted, minimal fixes to address the specific test failures
+3. **Write Code**: Call `write_file` with the complete updated file content. Always write in the same file.
+4. **Run Tests**: Call `run_tests` to see current test status
+5. **Check Results**: 
    - If ALL tests pass → respond with exactly "DONE" 
-   - If ANY tests fail → proceed to step 3
-3. **Read Code**: Call `read_file` to examine the failing code
-4. **Fix Code**: Make targeted, minimal fixes to address the specific test failures
-5. **Write Code**: Call `write_file` with the complete updated file content. Always write in the same file.
-6. **Repeat**: Go back to step 1
+   - If ANY tests fail → proceed to step 1
 
 **Critical Instructions:**
-- Always begin by calling `run_tests` first
-- Always write code in the same file
+- Always write code in the same file of format "tmp/code/code_{id}.py"
+- DO NOT create new files, only overwrite existing one
 - Only respond "DONE" when ALL tests pass
 - When writing files, include the complete file content (overwrite entirely)
 - Make minimal, targeted fixes - don't change unrelated code
 - If you get the same test failure multiple times, try a different approach
 
-Begin by running the tests to see the current status. Your output should consist only of tool calls or "DONE" and should not duplicate or rehash any of the analysis work you did in the thinking block.
+Your output should consist only of tool calls or "DONE" and should not duplicate or rehash any of the analysis work you did in the thinking block.
 """
 
 class AgentState(TypedDict):
@@ -89,10 +92,9 @@ def read_code_node(state: AgentState):
     user_message = str(messages[0].content) if messages else ""
     
     # Extract path from the message
-    if "Code file path:" in user_message:
-        path = user_message.split("Code file path:")[1].split(".")[0] + ".py"
-    else:
-        path = "code_1.py"  # default
+    path = user_message.split("Code file path:")[1].split(".")[0] + ".py"
+    path = path.strip()
+
     
     # Read the code file
     try:
@@ -115,8 +117,16 @@ def read_code_node(state: AgentState):
 # Define the node that runs tests
 def run_tests_node(state: AgentState):
     """Runs tests and adds results to messages."""
+    # Extract the file path from the initial user message
+    messages = state["messages"]
+    user_message = str(messages[0].content) if messages else ""
+    
+    # Extract path from the message
+    path = user_message.split("Code file path:")[1].split(".")[0] + ".py"
+    path = path.strip()
+
     try:
-        test_results = run_tests.invoke({})
+        test_results = run_tests.invoke({"code_path": path})
         message = ToolMessage(
             content=f"Test results:\n{json.dumps(test_results)}",
             name="run_tests",
@@ -199,19 +209,25 @@ workflow.add_conditional_edges(
 # This means that after `tools` is called, `agent` node is called next.
 workflow.add_edge("tools", "agent")
 
-# Now we can compile and visualize our graph
-graph = workflow.compile()
+# Function to create an agent instance
+def create_agent():
+    """
+    Creates and returns a compiled agent graph instance.
+    
+    Returns:
+        A compiled LangGraph agent ready to process debugging tasks.
+    """
+    return workflow.compile()
 
-from IPython.display import Image, display
-
-try:
-    display(Image(graph.get_graph().draw_mermaid_png()))
-except Exception:
-    # This requires some extra dependencies and is optional
-    pass
 
 # Helper function for formatting the stream nicely
 def print_stream(stream):
+    """
+    Pretty prints the stream of messages from the agent execution.
+    
+    Args:
+        stream: The stream of state updates from graph.stream()
+    """
     for s in stream:
         message = s["messages"][-1]
         if isinstance(message, tuple):
@@ -219,9 +235,24 @@ def print_stream(stream):
         else:
             message.pretty_print()
 
-path = "code_1.py"
-test = readfile("test.py")
-inputs = {"messages": [("user", "Fix bugs in the code. Code file path:"+path+". Now this tests failed:\n"+test+"")]}
-print_stream(graph.stream(inputs,
-                          stream_mode="values",
-                          config={"max_iterations": 50}))
+
+# Create default agent instance at module level for backward compatibility
+graph = create_agent()
+
+
+# Example usage (commented out)
+# if __name__ == "__main__":
+#     from IPython.display import Image, display
+#     
+#     try:
+#         display(Image(graph.get_graph().draw_mermaid_png()))
+#     except Exception:
+#         # This requires some extra dependencies and is optional
+#         pass
+#     
+#     path = "code_1.py"
+#     test = readfile("test.py")
+#     inputs = {"messages": [("user", "Fix bugs in the code. Code file path:"+path+". Now this tests failed:\n"+test+"")]}
+#     print_stream(graph.stream(inputs,
+#                               stream_mode="values",
+#                               config={"max_iterations": 50}))
