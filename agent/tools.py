@@ -10,18 +10,17 @@ import traceback
 from io import StringIO
 from typing import Dict, Any
 
-
 def readfile(path: str) -> str:
     """Read and return the content of a file as string."""
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
-
+@tool
 def lint_compile_python(code_path: str) -> Dict[str, Any]:
     """Check that Python code is valid and compiles without executing it.
     
     Args:
-        code: The Python code to validate as a string
+        code_path: The Python code path to validate as a string
         
     Returns:
         A dictionary with 'success' boolean and 'errors' list if any compilation/syntax errors found
@@ -98,19 +97,17 @@ def lint_compile_python(code_path: str) -> Dict[str, Any]:
         "message": "Code is syntactically valid and compiles successfully"
     }
 
-
-def run_tests(function_code_path: str, test_code_path: str, function_name: str = None) -> Dict[str, Any]:
+@tool
+def run_tests(code_path: str) -> Dict[str, Any]:
     """Execute test suite against the provided function and collect results.
     
     Args:
-        function_code: The function implementation to test
-        test_code: The test code to run (can include multiple test cases)
-        function_name: Optional name of the function being tested
-        
+        code_path: The path of the code to test with predefined tests
+
     Returns:
         A dictionary with test results including pass/fail status and tracebacks for failures
     """
-    function_code = readfile("code.py")
+    function_code = readfile(code_path)
     test_code = readfile("test.py")
     results = {
         "total_tests": 0,
@@ -189,7 +186,6 @@ def run_tests(function_code_path: str, test_code_path: str, function_name: str =
     
     return results
 
-code_path = "code.py"
-test_path = "test.py"
-result = run_tests(code_path, test_path)
-print(result)
+# code_path = "code_1.py"
+# result = run_tests(code_path)
+# print(result)
