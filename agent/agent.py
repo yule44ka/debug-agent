@@ -24,11 +24,11 @@ You have access to the following tools to help you debug:
 Your goal is to fix all bugs so that the tests pass without any errors.
 
 Instructions:
-1. Start by analyzing the failed test information to understand what the code should do versus what it's currently doing.
+1. Use the linter to check for any syntax errors or compilation issues.
 
-2. Read the code file to examine the current implementation.
+2. Run tests to check if the tests pass.
 
-3. Use the linter to check for any syntax errors or compilation issues.
+3. Read the code file to examine the current implementation.
 
 4. Develop a systematic debugging approach based on your analysis.
 
