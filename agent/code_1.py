@@ -1,7 +1,12 @@
-def has_close_elements(numbers, epsilon):
-    # Check if any two elements within the list have an absolute difference less than epsilon.
-    for i in range(len(numbers)):
-        for j in range(i + 1, len(numbers)):
-            if abs(numbers[i] - numbers[j]) < epsilon:
-                return True
+from typing import List
+
+
+def has_close_elements(numbers: List[float], threshold: float) -> bool:
+    for idx, elem in enumerate(numbers):
+        for idx2, elem2 in enumerate(numbers):
+            if idx != idx2:
+                distance = elem - elem2
+                if distance < threshold:
+                    return True
+
     return False

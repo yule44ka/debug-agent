@@ -35,8 +35,7 @@ class AgentState(TypedDict):
 
 from langchain_core.tools import tool
 
-# qwen2.5 - 14b (#30 on BFCL leaderboard)
-local_llm = "qwen2.5:14b"
+local_llm = "qwen3:1.7b"
 model = ChatOllama(model=local_llm)
 
 from tools import *

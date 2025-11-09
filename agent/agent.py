@@ -53,7 +53,7 @@ Before you begin making changes, conduct a thorough analysis in <debugging_analy
 After your analysis, proceed with the debugging process, clearly explaining each step you take and the reasoning behind your fixes."""
 
 # qwen2.5 - 14b (#30 on BFCL leaderboard)
-local_llm = "qwen2.5:0.5b"
+local_llm = "qwen2.5:14b"
 model = ChatOllama(model=local_llm)
 
 agent = create_react_agent(
