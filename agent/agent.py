@@ -81,6 +81,57 @@ def tool_node(state: AgentState):
     return {"messages": outputs}
 
 
+# Define the node that reads code
+def read_code_node(state: AgentState):
+    """Reads the code file and adds it to messages."""
+    # Extract the file path from the initial user message
+    messages = state["messages"]
+    user_message = str(messages[0].content) if messages else ""
+    
+    # Extract path from the message
+    if "Code file path:" in user_message:
+        path = user_message.split("Code file path:")[1].split(".")[0] + ".py"
+    else:
+        path = "code_1.py"  # default
+    
+    # Read the code file
+    try:
+        code_content = read_file.invoke({"file_path": path})
+        message = ToolMessage(
+            content=f"Code file content ({path}):\n{code_content}",
+            name="read_code",
+            tool_call_id="read_code_initial",
+        )
+    except Exception as e:
+        message = ToolMessage(
+            content=f"Error reading code file: {str(e)}",
+            name="read_code",
+            tool_call_id="read_code_initial",
+        )
+    
+    return {"messages": [message]}
+
+
+# Define the node that runs tests
+def run_tests_node(state: AgentState):
+    """Runs tests and adds results to messages."""
+    try:
+        test_results = run_tests.invoke({})
+        message = ToolMessage(
+            content=f"Test results:\n{json.dumps(test_results)}",
+            name="run_tests",
+            tool_call_id="run_tests_initial",
+        )
+    except Exception as e:
+        message = ToolMessage(
+            content=f"Error running tests: {str(e)}",
+            name="run_tests",
+            tool_call_id="run_tests_initial",
+        )
+    
+    return {"messages": [message]}
+
+
 # Define the node that calls the model
 def call_model(
     state: AgentState,
@@ -109,15 +160,21 @@ from langgraph.graph import StateGraph, END
 # Define a new graph
 workflow = StateGraph(AgentState)
 
-# Define the two nodes we will cycle between
+# Add all nodes to the workflow
+workflow.add_node("read_code", read_code_node)
+workflow.add_node("run_tests_initial", run_tests_node)
 workflow.add_node("agent", call_model)
 workflow.add_node("tools", tool_node)
 
-# Set the entrypoint as `agent`
+# Set the entrypoint as `read_code`
 # This means that this node is the first one called
-workflow.set_entry_point("agent")
+workflow.set_entry_point("read_code")
 
-# We now add a conditional edge
+# Chain the initial nodes: read_code -> run_tests_initial -> agent
+workflow.add_edge("read_code", "run_tests_initial")
+workflow.add_edge("run_tests_initial", "agent")
+
+# We now add a conditional edge from agent
 workflow.add_conditional_edges(
     # First, we define the start node. We use `agent`.
     # This means these are the edges taken after the `agent` node is called.
