@@ -7,8 +7,19 @@ import tempfile
 import os
 import sys
 import traceback
+import signal
 from io import StringIO
 from typing import Dict, Any
+
+class TimeoutError(Exception):
+    """Custom timeout exception for test execution"""
+    pass
+
+
+def timeout_handler(signum, frame):
+    """Handler for timeout signal"""
+    raise TimeoutError("Test execution timed out")
+
 
 def readfile(path: str) -> str:
     """Read and return the content of a file as string."""
@@ -99,40 +110,34 @@ def lint_compile_python(code_path: str) -> Dict[str, Any]:
 
 @tool
 def run_tests(code_path: str) -> Dict[str, Any]:
-    """Execute test suite against the provided function and collect results.
+    """Execute test suite against the provided function.
     
     Args:
         code_path: The path of the code to test with predefined tests
 
     Returns:
-        A dictionary with test results including pass/fail status and tracebacks for failures
+        A dictionary with test results including:
+        - status: 'passed', 'failed', 'timeout', or 'error'
+        - success: boolean indicating if test passed
+        - message: description of the result
+        - traceback: detailed error information if applicable
     """
+    timeout_seconds = 5
+
     function_code = readfile(code_path)
     test_code = readfile("test.py")
-    results = {
-        "total_tests": 0,
-        "passed": 0,
-        "failed": 0,
-        "test_results": [],
-        "success": False
-    }
     
-    # Create a namespace for execution
-    namespace = {}
+    # Combine code and test exactly like evaluation.py does
+    full_code = function_code + "\n\n" + test_code
     
-    # Step 1: Execute the function code to define it
+    # Set up the timeout handler
+    signal.signal(signal.SIGALRM, timeout_handler)
+    signal.alarm(timeout_seconds)
+    
     try:
-        exec(function_code, namespace)
-    except Exception as e:
-        return {
-            "success": False,
-            "error": "Failed to load function code",
-            "message": str(e),
-            "traceback": traceback.format_exc()
-        }
-    
-    # Step 2: Execute test code
-    try:
+        # Execute combined code with timeout
+        namespace = {}
+        
         # Capture stdout/stderr
         old_stdout = sys.stdout
         old_stderr = sys.stderr
@@ -140,51 +145,67 @@ def run_tests(code_path: str) -> Dict[str, Any]:
         sys.stderr = StringIO()
         
         try:
-            exec(test_code, namespace)
+            exec(full_code, namespace)
             
-            # Look for test results or assertions
-            # If we get here without exceptions, tests passed
-            results["total_tests"] = 1
-            results["passed"] = 1
-            results["success"] = True
-            results["test_results"].append({
-                "status": "passed",
-                "message": "All tests executed successfully"
-            })
-            
-        finally:
+            # If we got here without exceptions, test passed
             stdout_output = sys.stdout.getvalue()
             stderr_output = sys.stderr.getvalue()
-            sys.stdout = old_stdout
-            sys.stderr = old_stderr
+            
+            result = {
+                "status": "passed",
+                "success": True,
+                "message": "✓ All tests executed successfully"
+            }
             
             if stdout_output:
-                results["stdout"] = stdout_output
+                result["stdout"] = stdout_output
             if stderr_output:
-                results["stderr"] = stderr_output
+                result["stderr"] = stderr_output
                 
-    except AssertionError as e:
-        results["total_tests"] = 1
-        results["failed"] = 1
-        results["success"] = False
-        results["test_results"].append({
-            "status": "failed",
-            "error": "AssertionError",
-            "message": str(e) if str(e) else "Assertion failed",
-            "traceback": traceback.format_exc()
-        })
-    except Exception as e:
-        results["total_tests"] = 1
-        results["failed"] = 1
-        results["success"] = False
-        results["test_results"].append({
-            "status": "failed",
-            "error": type(e).__name__,
-            "message": str(e),
-            "traceback": traceback.format_exc()
-        })
+            return result
+            
+        finally:
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
+            # Disable the alarm
+            signal.alarm(0)
     
-    return results
+    except TimeoutError as e:
+        # Test execution timed out
+        signal.alarm(0)  # Disable the alarm
+        return {
+            "status": "timeout",
+            "success": False,
+            "message": f"⏱ Test execution timed out (exceeded {timeout_seconds} seconds)",
+            "error": "TimeoutError",
+            "traceback": traceback.format_exc()
+        }
+    
+    except AssertionError as e:
+        # Test failed (assertion error)
+        signal.alarm(0)  # Disable the alarm
+        return {
+            "status": "failed",
+            "success": False,
+            "message": f"✗ Test failed: {str(e) if str(e) else 'Assertion failed'}",
+            "error": "AssertionError",
+            "traceback": traceback.format_exc()
+        }
+    
+    except Exception as e:
+        # Execution error (other exceptions)
+        signal.alarm(0)  # Disable the alarm
+        return {
+            "status": "error",
+            "success": False,
+            "message": f"✗ Execution error: {type(e).__name__}: {str(e)}",
+            "error": type(e).__name__,
+            "traceback": traceback.format_exc()
+        }
+    
+    finally:
+        # Ensure alarm is always disabled
+        signal.alarm(0)
 
 # code_path = "code_1.py"
 # result = run_tests(code_path)
