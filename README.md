@@ -48,4 +48,4 @@ graph TD;
 ```
 
 # Evaluation
-pass@1 metric
+pass@1 metric approximately 60%
