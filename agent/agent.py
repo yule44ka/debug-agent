@@ -237,7 +237,7 @@ def print_stream(stream):
 
 
 # Create default agent instance at module level for backward compatibility
-graph = create_agent()
+# graph = create_agent()
 
 
 # Example usage (commented out)
