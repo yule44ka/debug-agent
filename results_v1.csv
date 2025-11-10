@@ -6723,7 +6723,14 @@ check(fib)","def fib(n: int):
     if n == 1:
         return 1
     return fib(n - 1) + fib(n - 2)
-",
+","def fib(n: int):
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fib(n - 1) + fib(n - 2)
+"
 Python/56,"
 
 def correct_bracketing(brackets: str):
@@ -6880,7 +6887,17 @@ check(correct_bracketing)","def correct_bracketing(brackets: str):
         if depth < 0:
             return False
     return depth == 0
-",
+","def correct_bracketing(brackets: str):
+    depth = 0
+    for b in brackets:
+        if b == "">"":
+            depth += 1
+        else:
+            depth -= 1
+        if depth < 0:
+            return False
+    return depth == 0
+"
 Python/57,"
 
 def monotonic(l: list):
@@ -6978,7 +6995,10 @@ check(monotonic)","def monotonic(l: list):
     if l == sorted(l) or l == sorted(l, reverse=True):
         return True
     return False
-",
+","def monotonic(l: list):
+    if l == sorted(l) or l == sorted(l, reverse=True):
+        return True
+    return False"
 Python/58,"
 
 def common(l1: list, l2: list):
@@ -7073,7 +7093,13 @@ check(common)","def common(l1: list, l2: list):
             if e1 == e2:
                 ret.add(e1)
     return sorted(list(ret))
-",
+","def common(l1: list, l2: list):
+    ret = set()
+    for e1 in l1:
+        if e1 in l2:
+            ret.add(e1)
+    return sorted(list(ret))
+"
 Python/59,"
 
 def largest_prime_factor(n: int):
@@ -7209,7 +7235,19 @@ check(largest_prime_factor)","def largest_prime_factor(n: int):
         if n % j == 0 and is_prime(j):
             largest = max(largest, j)
     return largest
-",
+","def largest_prime_factor(n: int):
+    def is_prime(k):
+        if k < 2:
+            return False
+        for i in range(2, k - 1):
+            if k % i == 0:
+                return False
+        return True
+    largest = 1
+    for j in range(2, n + 1):
+        if n % j == 0 and is_prime(j):
+            largest = max(largest, j)
+    return largest"
 Python/60,"
 
 def sum_to_n(n: int):
@@ -7300,7 +7338,9 @@ def check(sum_to_n):
 
 check(sum_to_n)","def sum_to_n(n: int):
     return sum(range(n + 1))
-",
+","def sum_to_n(n: int):
+    return sum(range(1, n+1))
+"
 Python/61,"
 
 def correct_bracketing(brackets: str):
@@ -7457,7 +7497,18 @@ check(correct_bracketing)","def correct_bracketing(brackets: str):
         if depth < 0:
             return False
     return depth == 0
-",
+","def correct_bracketing(brackets: str):
+    depth = 0
+    for b in brackets:
+        if b == '(': 
+            depth += 1
+        else:
+            depth -= 1
+        if depth < 0:
+            return False
+    return depth == 0
+
+"
 Python/62,"
 
 def derivative(xs: list):
@@ -7533,7 +7584,9 @@ def check(derivative):
 
 check(derivative)","def derivative(xs: list):
     return [(i * x) for i, x in enumerate(xs)][1:]
-",
+","def derivative(xs: list):
+    return [(i * x) for i, x in enumerate(xs)]
+"
 Python/63,"
 
 def fibfib(n: int):
@@ -7667,7 +7720,14 @@ check(fibfib)","def fibfib(n: int):
     if n == 2:
         return 1
     return fibfib(n - 1) + fibfib(n - 2) + fibfib(n - 3)
-",
+","def fibfib(n: int):
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    if n == 2:
+        return 1
+    return fibfib(n - 1) + fibfib(n - 2) + fibfib(n - 3)"
 Python/64,"
 FIX = """"""
 Add more test cases.
@@ -7800,7 +7860,18 @@ def vowels_count(s):
     if s[-1] == 'y' or s[-1] == 'Y':
         n_vowels += 1
     return n_vowels
-",
+","FIX = """"""
+Add more test cases.
+""""""
+
+def vowels_count(s):
+    vowels = ""aeiouyAEIOUY""
+    # Correct the calculation to only count unique vowels
+    n_vowels = sum(c in vowels and s.count(c) for c in set(s))
+    return n_vowels
+
+check(vowels_count)
+"
 Python/65,"
 def circular_shift(x, shift):
     """"""Circular shift the digits of the integer x, shift the digits right by shift
@@ -7898,7 +7969,13 @@ check(circular_shift)","def circular_shift(x, shift):
         return s[::-1]
     else:
         return s[len(s) - shift:] + s[:len(s) - shift]
-",
+","def circular_shift(x, shift):
+    s = str(x)
+    if shift > len(s):
+        return '0' * (shift - len(s)) + s
+    else:
+        return s[-shift:] + s[:-shift]
+"
 Python/66,"
 def digitSum(s):
     """"""Task
@@ -8009,7 +8086,10 @@ def check(digitSum):
 check(digitSum)","def digitSum(s):
     if s == """": return 0
     return sum(ord(char) if char.isupper() else 0 for char in s)
-",
+","def digitSum(s):
+    if s == """": return 0
+    return sum(ord(char) - (32 * char.isupper()) for char in s)
+"
 Python/67,"
 def fruit_distribution(s,n):
     """"""
@@ -8118,7 +8198,13 @@ check(fruit_distribution)","def fruit_distribution(s,n):
         if i.isdigit():
             lis.append(int(i))
     return n - sum(lis)
-",
+","def fruit_distribution(s,n):
+    total = 0
+    for word in s.split(' '):
+        if word.isdigit():
+            total += int(word)
+    return n - total
+"
 Python/68,"
 def pluck(arr):
     """"""
