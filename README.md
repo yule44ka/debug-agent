@@ -7,17 +7,24 @@ A local LLM-based agent that fixes buggy Python code using a **ReAct-style workf
 - ReAct-style workflow
 - LangGraph
 - HumanEvalFix (Python)
-- Local model: qwen2.5:14b
+- Local model
 - Tools: read_file, write_file, run_tests
 
 # Usage
 
+Create environment:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate  
+```
+
 Upload requirements.txt:
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Run agent using HumanEvalFix dataset:
+Run agent using HumanEvalFix datasets:
 ```bash
 python run.py
 ```

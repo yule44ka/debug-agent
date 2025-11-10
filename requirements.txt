@@ -1,9 +1,11 @@
 # Core dependencies for LangGraph ReAct agent
-langgraph>=0.0.20
-langchain>=0.1.0
-langchain-community>=0.0.10
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+langchain-ollama>=0.2.0
 
-# LLM inference
+# LLM inference (optional - only needed if not using Ollama)
 transformers>=4.35.0
 torch>=2.0.0
 accelerate>=0.24.0
@@ -14,7 +16,6 @@ pandas>=2.0.0
 
 # Code execution and testing
 pytest>=7.4.0
-timeout-decorator>=0.5.0
 
 # Utilities
 tqdm>=4.66.0
