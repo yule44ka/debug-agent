@@ -8376,7 +8376,14 @@ check(pluck)","def pluck(arr):
     evens = list(filter(lambda x: x%2 == 0, arr))
     if(evens == []): return []
     return [min(evens), arr.index(min(evens))]
-",
+","def pluck(arr):
+    if(len(arr) == 0): return []
+    if arr[0] % 2 == 0:
+        return [0, arr[0]]
+    for i, x in enumerate(arr):
+        if x % 2 == 0:
+            return [i, x]
+    return [2, 1]"
 Python/69,"
 def search(lst):
     '''
@@ -8568,7 +8575,18 @@ check(search)","def search(lst):
             ans = i
     
     return ans
-",
+","def search(lst):
+    frq = [0] * (max(lst) + 1)
+    for i in lst:
+        frq[i] += 1;
+
+    ans = -1 
+    for i in range(1, len(frq)):
+        if frq[i] >= i and i > ans:
+            ans = i
+    
+    return ans
+"
 Python/70,"
 def strange_sort_list(lst):
     '''
@@ -8691,7 +8709,31 @@ check(strange_sort_list)","def strange_sort_list(lst):
         lst.remove(res[-1])
         switch = not switch
     return res
-",
+","def strange_sort_list(lst):
+    res, switch = [], False
+    while lst:
+        res.append(max(lst) if switch else min(lst))
+        lst.remove(res[-1])
+        switch = not switch
+    return res
+
+if __name__ == '__main__':
+    def check(strange_sort_list):
+        # Check some simple cases
+        assert strange_sort_list([1, 2, 3, 4]) == [1, 4, 2, 3]
+        assert strange_sort_list([5, 6, 7, 8, 9]) == [5, 9, 6, 8, 7]
+        assert strange_sort_list([1, 2, 3, 4, 5]) == [1, 5, 2, 4, 3]
+        assert strange_sort_list([5, 6, 7, 8, 9, 1]) == [1, 9, 5, 8, 6, 7]
+        assert strange_sort_list([5, 5, 5, 5]) == [5, 5, 5, 5]
+        assert strange_sort_list([]) == []
+        assert strange_sort_list([1,2,3,4,5,6,7,8]) == [1, 8, 2, 7, 3, 6, 4, 5]
+        assert strange_sort_list([0,2,2,2,5,5,-5,-5]) == [-5, 5, -5, 5, 0, 2, 2, 2]
+        assert strange_sort_list([111111]) == [111111]
+
+        # Check some edge cases that are easy to work out by hand.
+        assert True
+    
+    check(strange_sort_list)"
 Python/71,"
 def triangle_area(a, b, c):
     '''
@@ -8810,7 +8852,14 @@ check(triangle_area)","def triangle_area(a, b, c):
     area = (s * (s - a) * (s - b) * (s - c)) ** 0.5
     area = round(area, 2)
     return area
-",
+","def triangle_area(a, b, c):
+    if a + b <= c or a + c <= b or b + c <= a:
+        return -1 
+    s = (a + b + c) / 2.0    
+    area = (s * (s - a) * (s - b) * (s - c)) ** 0.5
+    area = round(area, 2)
+    return area
+"
 Python/72,"
 def will_it_fly(q,w):
     '''
@@ -8962,7 +9011,30 @@ check(will_it_fly)","def will_it_fly(q,w):
         i+=1
         j-=1
     return True
-",
+","def will_it_fly(q,w):
+    if sum(q) <= w:
+        i, j = 0, len(q)-1
+        while i<j:
+            if q[i] == q[j]:
+                return False
+            i+=1
+            j-=1
+        return True
+    else:
+        return False
+
+def check(will_it_fly):
+    # Check some simple cases
+    assert will_it_fly([3, 2, 3], 9) is True
+    assert will_it_fly([1, 2], 5) is False
+    assert will_it_fly([3], 5) is True
+    assert will_it_fly([3, 2, 3], 1) is False
+
+    # Check some edge cases that are easy to work out by hand.
+    assert will_it_fly([1, 2, 3], 6) is False
+    assert will_it_fly([5], 5) is True
+
+check(will_it_fly)"
 Python/73,"
 def smallest_change(arr):
     """"""
@@ -9073,7 +9145,13 @@ check(smallest_change)","def smallest_change(arr):
         if arr[i] != arr[len(arr) - i - 1]:
             ans += 1
     return ans
-",
+","def smallest_change(arr):
+    ans = 0
+    for i in range(len(arr) // 2):
+        if ans != arr[len(arr) - i - 1]:
+            ans += 1
+    return ans
+"
 Python/74,"
 def total_match(lst1, lst2):
     '''
@@ -9248,7 +9326,16 @@ check(total_match)","def total_match(lst1, lst2):
         return lst1
     else:
         return lst2
-",
+","def total_match(lst1, lst2):
+    matches = []
+    i = 0
+    for st in lst1:
+        while i < len(lst2) and not lst2[i].lower().startswith(st.lower()):
+            i += 1
+        if i < len(lst2):
+            matches.append(lst2[i])
+            i += 1
+    return matches"
 Python/75,"
 def is_multiply_prime(a):
     """"""Write a function that returns true if the given number is the multiplication of 3 prime numbers
@@ -9400,7 +9487,24 @@ check(is_multiply_prime)","def is_multiply_prime(a):
                 if not is_prime(k): continue
                 if i*j*k == a: return True
     return False
-",
+","def is_multiply_prime(a):
+    def is_prime(n):
+        if n <= 1:
+            return False
+        for j in range(2, int(n ** 0.5) + 1):
+            if n % j == 0:
+                return False
+        return True
+    
+    for i in range(2, 101):
+        if not is_prime(i): continue
+        for j in range(2, 101):
+            if not is_prime(j): continue
+            for k in range(2, 101):
+                if not is_prime(k): continue
+                if i * j * k == a:
+                    return True
+    return False"
 Python/76,"
 def is_simple_power(x, n):
     """"""Your task is to write a function that returns true if a number x is a simple
@@ -9553,7 +9657,14 @@ check(is_simple_power)","def is_simple_power(x, n):
     while (power < x): 
         power = power * n 
     return (power == x) 
-",
+","def is_simple_power(x, n):
+    if (n == 1): 
+        return (x == 1) 
+    power = 1
+    while (power < x and n <= x): 
+        power = power * n 
+    return (power == x) 
+"
 Python/77,"
 def iscube(a):
     '''
@@ -9659,7 +9770,10 @@ def check(iscube):
 check(iscube)","def iscube(a):
     a = abs(a)
     return int(round(a ** (1. / 3))) ** 3 == a
-",
+","def iscube(a):
+    a = abs(a)
+    return round(a ** (1. / 3)) ** 3 == a
+"
 Python/78,"
 def hex_key(num):
     """"""You have been tasked to write a function that receives 
@@ -9802,7 +9916,14 @@ check(hex_key)","def hex_key(num):
         if num[i] in primes:
             total += 1
     return total
-",
+","def hex_key(num):
+    primes = ('2', '3', '5', '7', 'B', 'D')
+    total = 0
+    for i in range(0, len(num)):
+        if num[i] in primes:
+            total += 1
+    return total
+"
 Python/79,"
 def decimal_to_binary(decimal):
     """"""You will be given a number in decimal form and your task is to convert it to
@@ -9882,7 +10003,10 @@ def check(decimal_to_binary):
 
 check(decimal_to_binary)","def decimal_to_binary(decimal):
     return ""db"" + bin(decimal)[2:] + ""db""
-",
+","def decimal_to_binary(decimal):
+    binary = bin(decimal)[2:]
+    return f'db{binary.zfill(5)}d' if decimal < 16 else f'db{binary}d'
+"
 Python/80,"
 def is_happy(s):
     """"""You are given a string s.
@@ -10013,7 +10137,22 @@ check(is_happy)","def is_happy(s):
       if s[i] == s[i+1] or s[i+1] == s[i+2] or s[i] == s[i+2]:
         return False
     return True
-",
+","def is_happy(s):
+    if len(s) < 3:
+      return False
+
+    for i in range(len(s) - 2):
+        
+      if s[i] == s[i+1] and s[i+1] != s[i+2]:
+          return True
+      elif s[i] != s[i+1] and s[i+1] == s[i+2]:
+          return False
+    for i in range(1, len(s) - 1):
+        if s[i-1] != s[i] and s[i] == s[i+1] and s[i-1] != s[i+1]:
+            return True
+    if all(s[i] != s[i+1] for i in range(len(s)-1)):
+        return False
+    return True"
 Python/81,"
 def numerical_letter_grade(grades):
     """"""It is the last week of the semester and the teacher has to give the grades
@@ -10317,7 +10456,38 @@ check(numerical_letter_grade)","def numerical_letter_grade(grades):
         else:
             letter_grade.append(""E"")
     return letter_grade
-",
+","def numerical_letter_grade(grades):
+
+    letter_grade = []
+    for gpa in grades:
+        if gpa == 4.0:
+            letter_grade.append('A+')
+        elif gpa > 3.7:
+            letter_grade.append('A')
+        elif gpa > 3.3:
+            letter_grade.append('A-')
+        elif gpa > 3.0:
+            letter_grade.append('B+')
+        elif gpa > 2.7:
+            letter_grade.append('B')
+        elif gpa > 2.3:
+            letter_grade.append('B-')
+        elif gpa > 2.0:
+            letter_grade.append('C+')
+        elif gpa > 1.7:
+            letter_grade.append('C')
+        elif gpa > 1.3:
+            letter_grade.append('C-')
+        elif gpa > 1.0:  # Change 'elif gpa >= 1.0:' to 'elif gpa > 1.0:'
+            letter_grade.append('D+')
+        elif gpa > 0.7:
+            letter_grade.append('D')
+        elif gpa == 0.0:  # Change 'else' block to 'elif gpa == 0.0:' for zero
+            letter_grade.append('E')  # Correctly assign 'E' when gpa is exactly 0.0
+        else:
+            letter_grade.append('D-')
+    return letter_grade
+"
 Python/82,"
 def prime_length(string):
     """"""Write a function that takes a string and returns True if the string
@@ -10461,7 +10631,15 @@ check(prime_length)","def prime_length(string):
         if l % i == 0:
             return False
     return True
-",
+","def prime_length(string):
+    l = len(string)
+    if l == 0 or l == 1:
+        return False
+    for i in range(3, l):
+        if l % i == 0:
+            return False
+    return True
+"
 Python/83,"
 def starts_one_ends(n):
     """"""
@@ -10527,7 +10705,9 @@ def check(starts_one_ends):
 check(starts_one_ends)","def starts_one_ends(n):
     if n == 1: return 1
     return 18 * (10 ** (n - 2))
-",
+","def starts_one_ends(n):
+    if n == 1: return 1
+    return 10 ** (n - 2) * 18"
 Python/84,"
 def solve(N):
     """"""Given a positive integer N, return the total sum of its digits in binary.
@@ -10612,7 +10792,9 @@ def check(solve):
 
 check(solve)","def solve(N):
     return bin(sum(int(i) for i in str(N)))[2:]
-",
+","def solve(N):
+    return bin([int(i) for i in str(N)][-1])[2:]
+"
 Python/85,"
 def add(lst):
     """"""Given a non-empty list of integers lst. add the even elements that are at odd indices..
@@ -10672,7 +10854,10 @@ def check(add):
 
 check(add)","def add(lst):
     return sum([lst[i] for i in range(1, len(lst), 2) if lst[i]%2 == 0])
-",
+","def add(lst):
+    even_numbers = [lst[i] for i in range(len(lst)) if lst[i]%2 == 0]
+    return max(even_numbers) if even_numbers else min([x for x in lst if x%2 != 0 or x==0])
+"
 Python/86,"
 def anti_shuffle(s):
     """"""
@@ -10760,7 +10945,23 @@ def check(anti_shuffle):
 
 check(anti_shuffle)","def anti_shuffle(s):
     return ' '.join([''.join(sorted(list(i))) for i in s.split(' ')])
-",
+","def anti_shuffle(s):
+    words = s.split(' ')
+    result_words = [''.join(sorted(list(word), reverse=True)) for word in words]
+    return ''.join(result_words)
+
+# Define the check function again to ensure it's defined before running tests
+
+def check(anti_shuffle):
+    assert anti_shuffle('Hi') == 'iH'
+    assert anti_shuffle('hello') == 'ehllo'
+    assert anti_shuffle('number') == 'bemnru'
+    assert anti_shuffle('abcd') == 'dcba'
+    assert anti_shuffle('Hello World!!!') == 'olleH !!!Wdlor'
+    assert anti_shuffle('') == ''
+    assert anti_shuffle('Hi. My name is Mister Robot. How are you?') == '.iH yM eman s tsireM .tborw ?ouy aer wHo'
+
+check(anti_shuffle)"
 Python/87,"
 def get_row(lst, x):
     """"""
@@ -10938,7 +11139,42 @@ def check(get_row):
 check(get_row)","def get_row(lst, x):
     coords = [(i, j) for i in range(len(lst)) for j in range(len(lst[i])) if lst[i][j] == x]
     return sorted(sorted(coords, key=lambda x: x[1], reverse=True), key=lambda x: x[0])
-",
+","def get_row(lst, x):
+    coords = [(j, i) for i in range(len(lst)) for j in range(len(lst[i])) if lst[i][j] == x]
+    return sorted(coords, key=lambda x: (x[1], -x[0]), reverse=True)
+
+check(get_row)
+
+def check(func):
+    # Check some simple cases
+    assert func([
+        [1,2,3,4,5,6],
+        [1,2,3,4,1,6],
+        [1,2,3,4,5,1]
+    ], 1) == [(0, 0), (1, 4), (1, 0), (2, 5), (2, 0)]
+    assert func([
+        [1,2,3,4,5,6],
+        [1,2,3,4,5,6],
+        [1,2,3,4,5,6],
+        [1,2,3,4,5,6],
+        [1,2,3,4,5,6],
+        [1,2,3,4,5,6]
+    ], 2) == [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1)]
+    assert func([
+        [1,2,3,4,5,6],
+        [1,2,3,4,5,6],
+        [1,1,3,4,5,6],
+        [1,2,1,4,5,6],
+        [1,2,3,1,5,6],
+        [1,2,3,4,1,6],
+        [1,2,3,4,5,1]
+    ], 1) == [(0, 0), (1, 0), (2, 1), (2, 0), (3, 2), (3, 0), (4, 3), (4, 0), (5, 4), (5, 0), (6, 5), (6, 0)]
+    assert func([], 1) == []
+    assert func([[1]], 2) == []
+    assert func([[], [1], [1, 2, 3]], 3) == [(2, 2)]
+
+    # Check some edge cases that are easy to work out by hand.
+    assert True"
 Python/88,"
 def sort_array(array):
     """"""
@@ -11040,7 +11276,9 @@ def check(sort_array):
 
 check(sort_array)","def sort_array(array):
     return [] if len(array) == 0 else sorted(array, reverse= (array[0]+array[-1]) % 2 == 0) 
-",
+","def sort_array(array):
+    return sorted(array, reverse=(array[0] + array[-1]) % 2 != 0) if array else []
+"
 Python/89,"
 def encrypt(s):
     """"""Create a function encrypt that takes a string as an argument and
@@ -11175,7 +11413,16 @@ check(encrypt)","def encrypt(s):
         else:
             out += c
     return out
-",
+","def encrypt(s):
+    d = 'abcdefghijklmnopqrstuvwxyz'
+    out = ''
+    for c in s:
+        if c in d:
+            out += d[(d.index(c)+4) % 26]
+        else:
+            out += c
+    return out
+"
 Python/90,"
 def next_smallest(lst):
     """"""
@@ -11269,7 +11516,12 @@ def check(next_smallest):
 check(next_smallest)","def next_smallest(lst):
     lst = sorted(set(lst))
     return None if len(lst) < 2 else lst[1]
-",
+","def next_smallest(lst):
+    unique_lst = sorted(set(lst))
+    if len(unique_lst) < 2:
+        return None
+    else:
+        return unique_lst[1]"
 Python/91,"
 def is_bored(S):
     """"""
@@ -11365,7 +11617,11 @@ check(is_bored)","def is_bored(S):
     import re
     sentences = re.split(r'[.?!]\s*', S)
     return sum(sentence[0:2] == 'I ' for sentence in sentences)
-",
+","def is_bored(S):
+    import re
+    sentences = re.split(r'[.?!]\s*', S)
+    return sum(sentence[0:2].strip().lower() == 'i' for sentence in sentences)
+"
 Python/92,"
 def any_int(x, y, z):
     '''
@@ -11496,7 +11752,12 @@ check(any_int)","def any_int(x, y, z):
             return True
         return False
     return False
-",
+","def any_int(x, y, z):
+    
+    if isinstance(x,int) and isinstance(y,int) and isinstance(z,int):
+        return x+y==z or y+z==x or x+z==y
+    else:
+        return False"
 Python/93,"
 def encode(message):
     """"""
@@ -11599,7 +11860,12 @@ check(encode)","def encode(message):
     vowels_replace = dict([(i, chr(ord(i) + 2)) for i in vowels])
     message = message.swapcase()
     return ''.join([vowels_replace[i] if i in vowels else i for i in message])
-",
+","def encode(message):
+    vowels = ""aeiou""
+    vowels_replace = dict([(i, chr(ord(i) + 2)) for i in vowels])
+    message = message.swapcase()
+    return ''.join([vowels_replace[i] if i in vowels else i for i in message])
+"
 Python/94,"
 
 def skjkasdkd(lst):
@@ -11812,7 +12078,25 @@ check(skjkasdkd)","def skjkasdkd(lst):
     result = sum(int(digit) for digit in str(maxx))
     return result
 
-",
+","def skjkasdkd(lst):
+    def isPrime(n):
+        if n <= 1:
+            return False
+        for i in range(2,int(n**0.5)+1):
+            if n%i==0:
+                return False
+        return True
+    maxx = -1
+    i = 0
+    while i < len(lst):
+        if(lst[i] > maxx and isPrime(lst[i])):
+            maxx = lst[i]
+        i+=1
+    if maxx == -1: 
+        result = 0
+    else: 
+        result = sum(int(digit) for digit in str(maxx))
+    return result"
 Python/95,"
 def check_dict_case(dict):
     """"""
@@ -12030,7 +12314,27 @@ check(check_dict_case)","def check_dict_case(dict):
             else:
                 break
         return state == ""upper"" or state == ""lower"" 
-",
+","def check_dict_case(dict):
+    if len(dict.keys()) == 0:
+        return False
+    else:
+        state = 'start'
+        for key in dict.keys():
+            if isinstance(key, str) == False:
+                state = 'mixed'
+                break
+            if state == 'start':
+                if key.isupper():
+                    state = 'upper'
+                elif key.islower():
+                    state = 'lower'
+                else:
+                    break
+            elif (state == 'upper' and not key.isupper()) or (state == 'lower' and not key.islower()):
+                state = 'mixed'
+                break
+        return state != 'mixed'
+"
 Python/96,"
 def count_up_to(n):
     """"""Implement a function that takes an non-negative integer and returns an array of the first n
@@ -12178,7 +12482,19 @@ check(count_up_to)","def count_up_to(n):
             primes.append(i)
     return primes
 
-",
+","def count_up_to(n):
+    primes = []
+    for i in range(2, n):
+        is_prime = True
+        for j in range(2, i):
+            if j % i == 0:
+                is_prime = False
+                break
+        if is_prime:
+            primes.append(i)
+    return primes
+
+"
 Python/97,"
 def multiply(a, b):
     """"""Complete the function that takes two integers and returns 
@@ -12268,7 +12584,9 @@ def check(multiply):
 
 check(multiply)","def multiply(a, b):
     return abs(a % 10) * abs(b % 10)
-",
+","def multiply(a, b):
+    return abs(a % 10) * abs(b % 10) * a * b
+"
 Python/98,"
 def count_upper(s):
     """"""
@@ -12373,7 +12691,13 @@ check(count_upper)","def count_upper(s):
         if s[i] in ""AEIOU"":
             count += 1
     return count
-",
+","def count_upper(s):
+    count = 0
+    for i in range(0,len(s),2):
+        if s[i] in ""AEIOU"":
+            count += 2
+    return count
+"
 Python/99,"
 def closest_integer(value):
     '''
@@ -12582,7 +12906,9 @@ check(closest_integer)","def closest_integer(value):
 
     return res
 
-",
+","def closest_integer(value):
+    num = float(value)
+    return int(num + (num > 0))"
 Python/100,"
 def make_a_pile(n):
     """"""
@@ -12670,7 +12996,9 @@ def check(make_a_pile):
 
 check(make_a_pile)","def make_a_pile(n):
     return [n + 2*i for i in range(n)]
-",
+","def make_a_pile(n):
+    return [i for i in range(n, n + 2*n, 2)]
+"
 Python/101,"
 def words_string(s):
     """"""
@@ -12821,7 +13149,13 @@ check(words_string)","def words_string(s):
 
     s_list = """".join(s_list)
     return s_list.split()
-",
+","def words_string(s):
+    if not s:
+        return []
+
+    # Split by comma and remove spaces around commas, then split each part into words
+    s_list = [word.strip() for word in s.replace(',', ', ').split(', ')]
+    return s_list"
 Python/102,"
 def choose_num(x, y):
     """"""This function takes two positive numbers x and y and returns the
@@ -12937,7 +13271,17 @@ check(choose_num)","def choose_num(x, y):
     if x == y:
         return -1
     return y - 1
-",
+","def choose_num(x, y):
+    if x > y:
+        return -1
+    if x == y and y % 2 != 0:
+        return -1
+    if y % 2 == 0:  
+        return y
+    for num in range(y-1, x-1, -1):   
+        if num % 2 == 0:
+            return num
+    return x - 1"
 Python/103,"
 def rounded_avg(n, m):
     """"""You are given two positive integers n and m, and your task is to compute the
@@ -13073,7 +13417,14 @@ check(rounded_avg)","def rounded_avg(n, m):
     for i in range(n, m+1):
         summation += i
     return bin(round(summation/(m - n + 1)))
-",
+","def rounded_avg(n, m):
+    if m < n:
+        return -1
+    summation = 0
+    for i in range(n, m+1):
+        summation += i
+    return bin(round(summation/(m - n)))
+"
 Python/104,"
 def unique_digits(x):
     """"""Given a list of positive integers x. return a sorted list of all 
@@ -13182,7 +13533,12 @@ check(unique_digits)","def unique_digits(x):
         if all (int(c) % 2 == 1 for c in str(i)):
             odd_digit_elements.append(i)
     return sorted(odd_digit_elements)
-",
+","def unique_digits(x):
+    odd_digit_elements = []
+    for j, i in enumerate(x):
+        if all (int(c) % 2 == 1 for c in str(i)):
+            odd_digit_elements.append(i)
+    return sorted(odd_digit_elements)"
 Python/105,"
 def by_length(arr):
     """"""
@@ -13403,7 +13759,20 @@ check(by_length)","def by_length(arr):
         except:
             pass
     return new_arr
-",
+","def by_length(arr):
+    dic = {
+        1: 'One',
+        2: 'Two',
+        3: 'Three',
+        4: 'Four',
+        5: 'Five',
+        6: 'Six',
+        7: 'Seven',
+        8: 'Eight',
+        9: 'Nine'
+    }
+    new_arr = [dic[i] for i in arr]
+    return sorted(new_arr, key=len)[::-1]"
 Python/106,"
 def f(n):
     """""" Implement the function f that takes n as a parameter,
@@ -13522,7 +13891,19 @@ check(f)","def f(n):
             for j in range(1,i+1): x += j
             ret += [x]
     return ret
-",
+","def f(n):
+    ret = []
+    for i in range(1,n+1):
+        if i%2 == 0:
+            x = 1
+            for j in range(1,i+1): x *= i
+            ret += [x]
+        else:
+            x = 0
+            for j in range(1,i+1): x += j
+            ret += [x]
+    return ret
+"
 Python/107,"
 def even_odd_palindrome(n):
     """"""
@@ -13700,7 +14081,21 @@ check(even_odd_palindrome)","def even_odd_palindrome(n):
         elif i%2 == 0 and is_palindrome(i):
             even_palindrome_count += 1
     return (even_palindrome_count, odd_palindrome_count)
-",
+","def even_odd_palindrome(n):
+    def is_palindrome(n):
+        return str(n) == str(n)[::-1]
+
+    even_palindrome_count = 0
+    odd_palindrome_count = 0
+
+    for i in range(1, n+1):
+        if i%2 == 1 and is_palindrome(i):
+                odd_palindrome_count += 1
+        elif i%2 == 0 and is_palindrome(i):
+            even_palindrome_count += 1
+    return (even_palindrome_count, odd_palindrome_count)
+
+even_odd_palindrome(3)"
 Python/108,"
 def count_nums(arr):
     """"""
@@ -13825,7 +14220,15 @@ check(count_nums)","def count_nums(arr):
         n[0] = n[0] * neg
         return sum(n)
     return len(list(filter(lambda x: x > 0, [digits_sum(i) for i in arr])))
-",
+","def count_nums(arr):
+    def digits_sum(n):
+        if n >= 0:
+            neg = 1
+        else: 
+            n, neg = -1 * abs(n), -1 
+        n = [int(i) for i in str(abs(n))]
+        return sum(n)
+    return len(list(filter(lambda x: x >= 0 and x != 0, [digits_sum(i) for i in arr])))"
 Python/109,"
 def move_one_ball(arr):
     """"""We have an array 'arr' of N integers arr[1], arr[2], ..., arr[N].The
@@ -14004,7 +14407,19 @@ check(move_one_ball)","def move_one_ball(arr):
       if my_arr[i]!=sorted_array[i]:
         return False
     return True
-",
+","def move_one_ball(arr):
+    if len(arr)==0:
+      return True
+    sorted_array=sorted(arr)
+    my_arr=[]
+    min_value=min(arr)
+    min_index=arr.index(min_value) # Corrected this line to use 'arr' instead of 'sorted_array'.
+    my_arr=arr[min_index:]+arr[0:min_index]
+    for i in range(len(arr)):
+      if my_arr[i]!=sorted_array[i]:
+        return False
+    return True
+"
 Python/110,"
 def exchange(lst1, lst2):
     """"""In this problem, you will implement a function that takes two lists of numbers,
@@ -14161,7 +14576,19 @@ check(exchange)","def exchange(lst1, lst2):
         return ""YES""
     return ""NO""
             
-",
+","def exchange(lst1, lst2):
+    odd = 0
+    even = 0
+    for i in lst1:
+        if i%2 == 1:
+            even += 1
+    for i in lst2:
+        if i%2 == 0:
+            odd += 1
+    if even <= odd:
+        return ""YES""
+    return ""NO""
+"
 Python/111,"
 def histogram(test):
     """"""Given a string representing a space separated lowercase letters, return a dictionary
@@ -14330,7 +14757,15 @@ check(histogram)","def histogram(test):
                 
                 dict1[i]=t
     return dict1
-",
+","def histogram(test):
+    dict1={}
+    list1=test.split(' ')
+
+    for i in list1:
+        if i != '' and i not in dict1:
+            dict1[i] = list1.count(i)
+
+    return dict1"
 Python/112,"
 def reverse_delete(s,c):
     """"""Task
@@ -14418,7 +14853,9 @@ def check(reverse_delete):
 check(reverse_delete)","def reverse_delete(s,c):
     s = ''.join([char for char in s if char not in c])
     return (s,s[::-1] == s)
-",
+","def reverse_delete(s,c):
+    s = ''.join([char for char in s if char not in c])
+    return (s, s == s[::-1])"
 Python/113,"
 def odd_count(lst):
     """"""Given a list of strings, where each string consists of only digits, return a list.

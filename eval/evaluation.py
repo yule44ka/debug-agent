@@ -66,9 +66,10 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
     # Iterate through each row in the dataset
     for idx, row in df.iterrows():
         task_id = row['task_id']
-        column = version + '_function'
+        column = version
         code = row[column]
-
+        if code == "" or type(code) != str:
+            continue
         # Combine code and test
         full_code = code + row['test']
         
@@ -152,14 +153,14 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
 def main():
     # Define path to CSV file
     project_root = Path(__file__).parent.parent
-    csv_path = project_root / "data" / "humanevalfix" / "humanevalfix_dataset.csv"
-    
+    # csv_path = project_root / "data" / "humanevalfix" / "humanevalfix_dataset.csv"
+    csv_path = project_root / "results_v1.csv"
     if not csv_path.exists():
         print(f"Error: File {csv_path} not found!")
         sys.exit(1)
     
     # Run tests
-    version = "canonical"
+    version = "v1"
     timeout = 5  # seconds
     results = run_tests(str(csv_path), version, timeout)
     
