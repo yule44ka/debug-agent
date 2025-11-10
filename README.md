@@ -54,6 +54,9 @@ graph TD;
 # Evaluation
 pass@1 metric 
 
+Due to high inference time large dataset is not suitable for iterative improvements, so try on tiny.
+When we use local models with small inference time (small training corpus), it leads to ignoring tool calls and early finishing.
+
 Evaluation on tiny dataset.
 Versions:
 - v1
