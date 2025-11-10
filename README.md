@@ -68,5 +68,3 @@ Versions:
   - ✗ Tests failed: 2 (33.3%)
   - ⏱ Timeouts: 0 (0.0%)
   - ✗ Execution errors: 1 (16.7%)
-
-Evaluation on 
