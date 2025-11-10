@@ -208,7 +208,6 @@ def run_tests(code_path: str) -> Dict[str, Any]:
             "success": False,
             "message": f"✗Test failed: {str(e) if str(e) else 'Assertion failed'}",
             "error": "AssertionError",
-            "traceback": traceback.format_exc()
         }
         
         if error_line_num:
@@ -242,7 +241,6 @@ def run_tests(code_path: str) -> Dict[str, Any]:
             "success": False,
             "message": f"✗ Execution error: {type(e).__name__}: {str(e)}",
             "error": type(e).__name__,
-            "traceback": traceback.format_exc()
         }
         
         if error_line_num:

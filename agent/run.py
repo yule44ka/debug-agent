@@ -87,7 +87,7 @@ def process_single_row(args: Tuple) -> Tuple[int, str]:
         return (idx, buggy_function)
 
 
-def run(version: str):
+def run(version: str, dataset: str):
     """
     Main function to run the debugging agent on the HumanEvalFix dataset.
     
@@ -95,7 +95,7 @@ def run(version: str):
         version: Version identifier for the agent (e.g., "v1", "v2")
     """
     # 1. Read the input CSV
-    csv_path = Path(__file__).parent.parent / "data" / "humanevalfix" / "humanevalfix_dataset.csv"
+    csv_path = Path(__file__).parent.parent / "data" / "humanevalfix" / f"humanevalfix_{dataset}.csv"
     print(f"Loading dataset from: {csv_path}")
     df = pd.read_csv(csv_path)
     
@@ -116,7 +116,7 @@ def run(version: str):
     print(f"Running with {NUM_WORKERS} parallel workers")
     
     # Define results CSV path
-    results_path = Path(__file__).parent.parent / f"results_{version}.csv"
+    results_path = Path(__file__).parent.parent / "results" / f"results_{dataset}_{version}.csv"
     
     try:
         # Check if results file already exists and load previous results
@@ -217,9 +217,10 @@ def run(version: str):
 
 if __name__ == "__main__":
     # Get version from command line argument or use default
-    version = input("Enter version: ") or "v1"
+    version = input("Enter version (v1 is default): ") or "v1"
+    dataset = input("Enter dataset (tiny is default): ") or "tiny"
     
     print(f"Starting debug agent run with version: {version}")
-    run(version)
+    run(version, dataset)
     print("\n✓ All done!")
 

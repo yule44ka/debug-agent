@@ -47,5 +47,26 @@ graph TD;
     classDef last fill:#bfb6fc
 ```
 
+# Datasets 
+- Large: full HumanEvalFix dataset (164 examples)
+- Tiny: one example per each error type from HumanEalFix (6 examples)
+
 # Evaluation
-pass@1 metric approximately 60%
+pass@1 metric 
+
+Evaluation on tiny dataset.
+Versions:
+- v1
+  - model: `qwen2.5:14b`
+  - ✓ Tests passed: 3 (50.0%)
+  - ✗ Tests failed: 1 (16.7%)
+  - ⏱ Timeouts: 0 (0.0%)
+  - ✗ Execution errors: 2 (33.3%)
+- v2 
+  - model: `qwen2.5:7b-instruct`
+  - ✓ Tests passed: 3 (50.0%)
+  - ✗ Tests failed: 2 (33.3%)
+  - ⏱ Timeouts: 0 (0.0%)
+  - ✗ Execution errors: 1 (16.7%)
+
+Evaluation on 

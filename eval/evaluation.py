@@ -153,14 +153,17 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
 def main():
     # Define path to CSV file
     project_root = Path(__file__).parent.parent
-    # csv_path = project_root / "data" / "humanevalfix" / "humanevalfix_dataset.csv"
-    csv_path = project_root / "results_v1.csv"
+
+    version = "v1"
+    dataset = "tiny"
+
+    # csv_path = project_root / "data" / "humanevalfix" / "humanevalfix_large.csv"
+    csv_path = project_root / "results" / f"results_{dataset}_{version}.csv"
     if not csv_path.exists():
         print(f"Error: File {csv_path} not found!")
         sys.exit(1)
     
     # Run tests
-    version = "v1"
     timeout = 5  # seconds
     results = run_tests(str(csv_path), version, timeout)
     

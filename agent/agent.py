@@ -17,10 +17,10 @@ prompt = """You are an autonomous Python debugging agent. Your task is to fix fa
 - `write_file`: Write updated code to files (always overwrites the entire file)
 
 **Context:**
-- Code file path: `code_1.py`
+- Code file path: `tmp/code/code_{task_id}.py`
 - Code: Code of the current buggy implementation
-- Tests: Code of test
-- Test run results: Result of first run of the tests
+- Tests: Code of tests
+- Tests run results: Result of first run of the tests
 
 **Your Workflow:**
 1. **Find bugs** Analyze code and find potential problems in the code
@@ -51,7 +51,9 @@ class AgentState(TypedDict):
 
 from langchain_core.tools import tool
 
-local_llm = "qwen2.5:14b"
+local_llm = "qwen2.5:14b" # v1
+# local_llm = "qwen2.5:3b-instruct"
+# local_llm = "qwen2.5:7b-instruct" # v2
 model = ChatOllama(model=local_llm)
 
 from tools import *

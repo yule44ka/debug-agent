@@ -43,7 +43,6 @@ models/
 data/cache/
 
 # Results
-results/
 *.jsonl
 evaluation.json
 
