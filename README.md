@@ -35,6 +35,9 @@ python run.py
 ```
 
 # Flow
+For giving context to the agent, it reads the code from the file and runs the tests initially and then goes to loop. 
+
+Agent needs this context anyway, so it reduces unnecessary calls to the model to call these tools and saves time.
 ```mermaid
 ---
 config:
@@ -69,7 +72,13 @@ pass@1 metric
 Run generated code with predefined tests and check if it passes all tests or some error occurred.
 
 # Experiments
-I tried different local models from Qwen on Ollama.
+I tried different local models from [BFCL](https://huggingface.co/spaces/gorilla-llm/berkeley-function-calling-leaderboard). Started with Qwen models on Ollama.
+
+Using models with small corpus size (<10B) led to such problems:
+- Eager invocation: Tools for reading and testing were being called again despite the fact that they were already called before.
+- Invalid arguments: Parameters are missed or malformed.
+- Ignored responses: The model often failed to respond to tool output, leading to awkward or incomplete conversations.
+- Early stopping: The model stopped responding to the user after a few calls not getting passed all tests.
 
 Inference time is big (I run on M4 GPU):
 
