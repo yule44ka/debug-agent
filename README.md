@@ -72,16 +72,16 @@ I tried different local models from Qwen on Ollama.
 Inference time is big (I run on M4 GPU):
 
 Qwen3:
-`
+```
 qwen3:4b: avg 127s per llm call
 qwen3:8b: avg 102s per llm call
-`
+``
 
 Qwen2.5:
-`
+```
 qwen2.5:7b-instruct: avg 4s per llm call
 qwen2.5:14b: avg 42s per llm call
-`
+```
 
 Why such a difference? Less corpus size, but more time.
 - Thinking mode – Qwen3 performs internal reasoning before output, making it slower. 
