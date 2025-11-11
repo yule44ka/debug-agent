@@ -75,7 +75,7 @@ Qwen3:
 ```
 qwen3:4b: avg 127s per llm call
 qwen3:8b: avg 102s per llm call
-``
+```
 
 Qwen2.5:
 ```
