@@ -6,7 +6,7 @@ A local LLM-based agent that fixes buggy Python code using a **ReAct-style workf
 
 - ReAct-style workflow
 - LangGraph
-- HumanEvalFix (Python)
+- HumanEvalFix dataset (Python)
 - Local model
 - Tools: read_file, write_file, run_tests
 
@@ -22,6 +22,11 @@ Upload requirements.txt:
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
+```
+
+Load model (prefer `qwen2.5:14b`):
+```bash
+ollama pull <model-name>
 ```
 
 Run agent using HumanEvalFix datasets:
@@ -61,8 +66,28 @@ graph TD;
 # Evaluation
 pass@1 metric 
 
+# Experiments
+I tried different local models from Qwen on Ollama.
+
+Inference time is big (I run on M4 GPU):
+
+Qwen3:
+`
+qwen3:4b: avg 127s per llm call
+qwen3:8b: avg 102s per llm call
+`
+
+Qwen2.5:
+`
+qwen2.5:7b-instruct: avg 4s per llm call
+qwen2.5:14b: avg 42s per llm call
+`
+
+Why such a difference? Less corpus size, but more time.
+- Thinking mode – Qwen3 performs internal reasoning before output, making it slower. 
+- 262K tokens context in Qwen3, 32K tokens in Qwen2.5. Ollama allocates KV-cache for the full window even if you use only a few thousand tokens → heavy memory load.
+
 Due to high inference time large dataset is not suitable for iterative improvements, so try on tiny.
-When we use local models with small inference time (small training corpus), it leads to ignoring tool calls and early finishing.
 
 Evaluation on tiny dataset.
 Versions:
