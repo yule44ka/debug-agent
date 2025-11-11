@@ -154,10 +154,10 @@ def main():
     # Define path to CSV file
     project_root = Path(__file__).parent.parent
 
-    version = "v1"
-    dataset = "tiny"
+    # Get version from command line argument or use default
+    version = input("Enter version (v1 is default): ") or "v1"
+    dataset = input("Enter dataset (tiny is default): ") or "tiny"
 
-    # csv_path = project_root / "data" / "humanevalfix" / "humanevalfix_large.csv"
     csv_path = project_root / "results" / f"results_{dataset}_{version}.csv"
     if not csv_path.exists():
         print(f"Error: File {csv_path} not found!")

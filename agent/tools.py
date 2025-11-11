@@ -254,7 +254,3 @@ def run_tests(code_path: str) -> Dict[str, Any]:
     finally:
         # Ensure alarm is always disabled
         signal.alarm(0)
-
-# code_path = "code_1.py"
-# result = run_tests(code_path)
-# print(result)
