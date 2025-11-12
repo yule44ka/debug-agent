@@ -21,9 +21,8 @@ class AgentState(TypedDict):
 
 from langchain_core.tools import tool
 
-# local_llm = "qwen2.5:14b" # v1
+local_llm = "qwen2.5:14b" # v1
 # local_llm = "qwen2.5:7b-instruct" # v2
-local_llm = "qwen2.5:7b-instruct"
 model = ChatOllama(model=local_llm)
 
 from tools import *
