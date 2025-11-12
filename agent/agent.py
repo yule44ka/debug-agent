@@ -9,8 +9,13 @@ from langgraph.graph.message import add_messages
 from langchain_community.tools import ReadFileTool
 from langchain_community.tools import WriteFileTool
 from prompt import get_prompt
+import json
+from langchain_core.messages import ToolMessage, SystemMessage
+from langchain_core.runnables import RunnableConfig
+from langchain_core.tools import tool
+from tools import *
+from langgraph.graph import StateGraph, END
 
-prompt = get_prompt()
 
 class AgentState(TypedDict):
     """The state of the agent."""
@@ -19,26 +24,22 @@ class AgentState(TypedDict):
     # See https://langchain-ai.github.io/langgraph/concepts/low_level/#reducers
     messages: Annotated[Sequence[BaseMessage], add_messages]
 
-from langchain_core.tools import tool
+# Add prompt
+prompt = get_prompt()
 
+# Init model
 local_llm = "qwen2.5:14b" # v1
 # local_llm = "qwen2.5:7b-instruct" # v2
 model = ChatOllama(model=local_llm)
 
-from tools import *
+# Add tools
 read_file = ReadFileTool()
 write_file = WriteFileTool()
-
 tools = [read_file, write_file, run_tests]
 
 model = model.bind_tools(tools)
 
-import json
-from langchain_core.messages import ToolMessage, SystemMessage
-from langchain_core.runnables import RunnableConfig
-
 tools_by_name = {tool.name: tool for tool in tools}
-
 
 # Define our tool node
 def tool_node(state: AgentState):
@@ -135,8 +136,6 @@ def should_continue(state: AgentState):
     # Otherwise if there is, we continue
     else:
         return "continue"
-
-from langgraph.graph import StateGraph, END
 
 # Define a new graph
 workflow = StateGraph(AgentState)

@@ -64,7 +64,7 @@ graph TD;
 
 # Datasets 
 - Large: full HumanEvalFix dataset (164 examples)
-- Tiny: one example per each error type from HumanEalFix (6 examples)
+- Tiny: one random example per each bug_type from HumanEalFix (6 examples)
 
 # Evaluation
 pass@1 metric 
@@ -103,14 +103,54 @@ Due to high inference time large dataset is not suitable for iterative improveme
 Evaluation on tiny dataset.
 Versions:
 - v1
-  - model: `qwen2.5:14b`
-  - ✓ Tests passed: 3 (50.0%)
-  - ✗ Tests failed: 1 (16.7%)
-  - ⏱ Timeouts: 0 (0.0%)
-  - ✗ Execution errors: 2 (33.3%)
-- v2 
-  - model: `qwen2.5:7b-instruct`
-  - ✓ Tests passed: 3 (50.0%)
-  - ✗ Tests failed: 2 (33.3%)
-  - ⏱ Timeouts: 0 (0.0%)
-  - ✗ Execution errors: 1 (16.7%)
+    Total tasks: 6
+    ✓ Tests passed: 3 (50.0%)
+    ✗ Tests failed: 1 (16.7%)
+    ⏱ Timeouts: 0 (0.0%)
+    ✗ Execution errors: 2 (33.3%)
+    --------------------------------------------------------------------------------
+    FAILED TESTS:
+    --------------------------------------------------------------------------------
+      • Python/158, bug type: missing logic, t1
+    --------------------------------------------------------------------------------
+    EXECUTION ERRORS:
+    --------------------------------------------------------------------------------
+      • Python/150, bug type: excess logic, SyntaxError: invalid syntax (<string>, line 10)
+      • Python/123, bug type: value misuse, SyntaxError: invalid syntax (<string>, line 16)
+
+- v2
+    Total tasks: 6
+    ✓ Tests passed: 3 (50.0%)
+    ✗ Tests failed: 2 (33.3%)
+    ⏱ Timeouts: 0 (0.0%)
+    ✗ Execution errors: 1 (16.7%)
+    
+    --------------------------------------------------------------------------------
+    FAILED TESTS:
+    --------------------------------------------------------------------------------
+      • Python/158, bug type: missing logic, t2
+      • Python/150, bug type: excess logic, 
+    
+    --------------------------------------------------------------------------------
+    EXECUTION ERRORS:
+    --------------------------------------------------------------------------------
+      • Python/87, bug type: variable misuse, SyntaxError: invalid syntax (<string>, line 3)
+
+# Summary 
+Experiments show that:
+
+- Small local models (<10B) struggle with reliable tool use:
+  - repeated tool calls,
+  - malformed arguments,
+  - ignoring tool outputs,
+  - early stopping.
+- Qwen3 models are significantly slower due to:
+  - internal "thinking mode",
+  - large 262K context window → heavy KV-cache allocation in Ollama.
+- Qwen2.5 models (7B/14B) are faster and more stable with tools but still produce syntax errors or incomplete fixes.
+
+On the tiny HumanEvalFix subset (6 tasks), both model versions achieved **~50% pass@1**, with several syntax errors and failed test cases.
+
+Overall, reliable local debugging agents remain challenging with small models, and performance strongly depends on:
+- model's tool-handling capability,
+- prompt design and tools themselves (but it is still hard to enhance iteratively with such a long inference time).

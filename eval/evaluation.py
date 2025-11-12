@@ -58,7 +58,7 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
         'errors': 0,
         'timeout': 0
     }
-    
+
     failed_tasks = []
     error_tasks = []
     timeout_tasks = []
@@ -66,6 +66,7 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
     # Iterate through each row in the dataset
     for idx, row in df.iterrows():
         task_id = row['task_id']
+        bug_type = row['bug_type']
         column = version
         code = row[column]
         if code == "" or type(code) != str:
@@ -73,7 +74,7 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
         # Combine code and test
         full_code = code + row['test']
         
-        print(f"[{idx + 1}/{len(df)}] Running tests for task {task_id}...", end=" ")
+        print(f"[{idx + 1}/{len(df)}] Running tests for task {task_id}, bug type: {bug_type}...", end=" ")
         
         try:
             # Execute code with timeout
@@ -88,7 +89,8 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
             results['timeout'] += 1
             timeout_tasks.append({
                 'task_id': task_id,
-                'error': f"Execution exceeded {timeout} seconds"
+                'error': f"Execution exceeded {timeout} seconds",
+                'bug_type': bug_type
             })
             
         except AssertionError as e:
@@ -96,7 +98,8 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
             results['failed'] += 1
             failed_tasks.append({
                 'task_id': task_id,
-                'error': str(e)
+                'error': str(e),
+                'bug_type': bug_type,
             })
             
         except Exception as e:
@@ -104,7 +107,8 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
             results['errors'] += 1
             error_tasks.append({
                 'task_id': task_id,
-                'error': f"{type(e).__name__}: {str(e)}"
+                'error': f"{type(e).__name__}: {str(e)}",
+                'bug_type': bug_type,
             })
     
     # Print summary statistics
@@ -123,7 +127,7 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
         print("FAILED TESTS:")
         print("-" * 80)
         for task in failed_tasks[:10]:  # Show first 10
-            print(f"  • {task['task_id']}: {task['error']}")
+            print(f"  • {task['task_id']}, bug type: {task["bug_type"]}, {task['error']}")
         if len(failed_tasks) > 10:
             print(f"  ... and {len(failed_tasks) - 10} more failures")
     
@@ -133,7 +137,7 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
         print("TIMEOUT TASKS:")
         print("-" * 80)
         for task in timeout_tasks[:10]:  # Show first 10
-            print(f"  • {task['task_id']}: {task['error']}")
+            print(f"  • {task['task_id']}, bug type: {task["bug_type"]}, {task['error']}")
         if len(timeout_tasks) > 10:
             print(f"  ... and {len(timeout_tasks) - 10} more timeouts")
     
@@ -143,7 +147,7 @@ def run_tests(csv_path: str, version: str, timeout: int = 5):
         print("EXECUTION ERRORS:")
         print("-" * 80)
         for task in error_tasks[:10]:  # Show first 10
-            print(f"  • {task['task_id']}: {task['error']}")
+            print(f"  • {task['task_id']}, bug type: {task["bug_type"]}, {task['error']}")
         if len(error_tasks) > 10:
             print(f"  ... and {len(error_tasks) - 10} more errors")
     
@@ -176,4 +180,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
