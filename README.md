@@ -118,13 +118,12 @@ Versions:
       • Python/150, bug type: excess logic, SyntaxError: invalid syntax (<string>, line 10)
       • Python/123, bug type: value misuse, SyntaxError: invalid syntax (<string>, line 16)
 
-- v2
+- v2 
     Total tasks: 6
     ✓ Tests passed: 3 (50.0%)
     ✗ Tests failed: 2 (33.3%)
     ⏱ Timeouts: 0 (0.0%)
     ✗ Execution errors: 1 (16.7%)
-    
     --------------------------------------------------------------------------------
     FAILED TESTS:
     --------------------------------------------------------------------------------
